@@ -9,12 +9,18 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
-import axios from "axios";
 
 const initialData = [
-    { id: 1, nombre: "Item 1", estado: 1 },
-    { id: 2, nombre: "Item 2", estado: 0 },
-    { id: 3, nombre: "Item 3", estado: 1 },
+    { id: 1, nombre: "Item 1", nombre2: "Item 1", estado: 1 },
+    { id: 2, nombre: null, nombre2: "Item prueba", estado: 1 },
+    { id: 3, nombre: null, nombre2: "Item prueba", estado: 0 },
+    { id: 4, nombre: "Item 4", nombre2: "Item 4", estado: 1 },
+    { id: 5, nombre: "Item 5", nombre2: "Item 5", estado: 0 },
+    { id: 6, nombre: "Item 6", nombre2: "Item 6", estado: 1 },
+    { id: 7, nombre: "Item 7", nombre2: "Item 7", estado: 0 },
+    { id: 8, nombre: "Item 8", nombre2: "Item 8", estado: 1 },
+    { id: 9, nombre: "Item 9", nombre2: "Item 9", estado: 0 },
+    { id: 10, nombre: "Item 10", nombre2: "Item 10", estado: 1 },
 ];
 
 function CustomTable() {
@@ -23,21 +29,12 @@ function CustomTable() {
     const [editIndex, setEditIndex] = useState(null);
     const [editName, setEditName] = useState("");
 
-    const handleSwitchChange = async (index) => {
-        const item = data[index];
-        const newState = item.estado === 1 ? 0 : 1;
-
-        try {
-            // Llamada a la API para actualizar el estado
-            await axios.patch(`/api/items/${item.id}/status`, { estado: newState });
-
-            // Actualiza el estado localmente solo si la API fue exitosa
-            const updatedData = [...data];
-            updatedData[index].estado = newState;
-            setData(updatedData);
-        } catch (error) {
-            console.error("Error actualizando el estado:", error);
-        }
+    const handleSwitchChange = (index) => {
+        setData(prevData => 
+            prevData.map((item, i) => 
+                i === index ? { ...item, estado: item.estado === 1 ? 0 : 1 } : item
+            )
+        );
     };
 
     const handleOpenDialog = (index) => {
@@ -50,27 +47,26 @@ function CustomTable() {
         setOpen(false);
     };
 
-    const handleSave = async () => {
-        const item = data[editIndex];
-
-        try {
-            // Llamada a la API para actualizar el nombre
-            await axios.patch(`/api/items/${item.id}/name`, { nombre: editName });
-
-            // Actualiza el nombre en el estado local solo si la API fue exitosa
-            const updatedData = [...data];
-            updatedData[editIndex].nombre = editName;
-            setData(updatedData);
-            handleCloseDialog();
-        } catch (error) {
-            console.error("Error actualizando el nombre del item:", error);
-        }
+    const handleSave = () => {
+        setData(prevData =>
+            prevData.map((item, i) =>
+                i === editIndex ? { ...item, nombre: editName } : item
+            )
+        );
+        handleCloseDialog();
     };
 
     const columns = [
         {
             name: "nombre",
             label: "Nombre Item",
+            options: {
+                customBodyRender: (value, tableMeta) => {
+                    const rowIndex = tableMeta.rowIndex;
+                    const item = data[rowIndex];
+                    return item.nombre !== null ? item.nombre : item.nombre2;
+                },
+            },
         },
         {
             name: "estado",
@@ -81,11 +77,11 @@ function CustomTable() {
                     return (
                         <>
                             <Switch
-                                checked={value === 1}
+                                checked={data[index].estado === 1}
                                 onChange={() => handleSwitchChange(index)}
                                 color="primary"
                             />
-                            {value === 1 ? "Habilitado" : "Deshabilitado"}
+                            {data[index].estado === 1 ? "Habilitado" : "Deshabilitado"}
                         </>
                     );
                 },
