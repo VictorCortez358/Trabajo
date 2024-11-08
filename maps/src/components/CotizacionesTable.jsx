@@ -2,6 +2,10 @@ import React from "react";
 import MUIDataTable from "mui-datatables";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+
 
 const columns = [
     { name: "Name", label: "Name" },
@@ -46,53 +50,17 @@ const options = {
 };
 
 function CustomTableCotizaciones() {
-    const generatePDF = () => {
-        const doc = new jsPDF();
+    const navigate = useNavigate();
+    const datosGenerados = { /* datos */ };
 
-        // Header styling
-        doc.autoTable({
-            startY: 15,
-            head: [["Cotización de proveedor"]],
-            theme: 'grid',
-            headStyles: { fillColor: [79, 129, 189], textColor: [255, 255, 255] },
-            styles: { cellPadding: 3 },
-        });
-
-        // User info styling
-        doc.autoTable({
-            startY: doc.lastAutoTable.finalY + 10, // Posiciona la siguiente tabla 10 unidades abajo de la anterior
-            head: [["Información de su negocio"]],
-            body: [
-                ["Nombre", userInfo.name],
-                ["NIT", userInfo.nit],
-                ["Dirección", userInfo.address],
-                ["Teléfono", userInfo.  phone],
-                ["Correo", userInfo.email],
-            ],
-            theme: 'grid',
-            headStyles: { fillColor: [79, 129, 189], textColor: [255, 255, 255] },
-            styles: { cellPadding: 3 },
-        });
-
-
-
-        // Table content styling
-        doc.autoTable({
-            startY: doc.lastAutoTable.finalY + 10, // Posiciona la siguiente tabla 10 unidades abajo de la anterior
-            head: [['Name', 'Company', 'City', 'Items']],
-            body: data.map((row) => [
-                row.Name,
-                row.Company,
-                row.City,
-                row.items.map(item => item.nombre || item.nombre2).join(", ")
-            ]),
-            theme: 'grid',
-            headStyles: { fillColor: [79, 129, 189], textColor: [255, 255, 255] },
-            styles: { cellPadding: 3 },
-        });
-
-        doc.save("Cotizacion_Proveedor.pdf");
+    const handleGenerarCotizacion = () => {
+        navigate('/otra-pagina', { data: datosGenerados });
     };
+
+    const location = useLocation();
+    const datosRecibidos = location.state;
+
+    return <div>{JSON.stringify(datosRecibidos)}</div>;
 
     return (
         <div>
